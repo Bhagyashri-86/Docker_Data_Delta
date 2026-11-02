@@ -1,12 +1,32 @@
-FROM python:3.10
+
+FROM python:3.10-slim
 
 WORKDIR /app
-COPY requirements.txt
+
+COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
-COPY app ./app
-COPY ml ./m1/app/
 
-RUN python m1/train.python
+COPY . .
+
+RUN python train_models.py
+
 EXPOSE 8000
-CMD ["sh","-c","unicorn app.main:app --host 0.0.0.0 --port ${port:-8000}"]
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN python train_models.py
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

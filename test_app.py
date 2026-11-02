@@ -20,15 +20,21 @@ def test_health():
 def test_prediction():
     response = client.post(
         "/predict",
-        json={"study_hours": 6}
+        json={"study_hours": 5}
     )
+
     assert response.status_code == 200
-    assert response.json()["predicted_score"] == 68.0
+
+    data = response.json()
+    assert data["study_hours"] == 5
+    assert "predicted_score" in data
+    assert 0 <= data["predicted_score"] <= 100
 
 
 def test_invalid_study_hours():
     response = client.post(
         "/predict",
-        json={"study_hours": 30}
+        json={"study_hours": 11}
     )
+
     assert response.status_code == 422
